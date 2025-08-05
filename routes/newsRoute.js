@@ -1,9 +1,11 @@
 const express = require('express');
+// import { FindOneAndDeleteOperation } from './../node_modules/mongodb/src/operations/find_and_modify';
 const router = express.Router();
 const axios = require('axios');
 const News = require('../models/New');
+const Headline  = require('../models/Headline')
 
-// 🔹 Route 1: Fetch and store articles using everything?q=Apple
+// Fetch and store articles using everything
 router.get('/fetch', async (req, res) => {
   try {
     const today = new Date();
@@ -38,7 +40,7 @@ router.get('/fetch', async (req, res) => {
   }
 });
 
-// 🔹 Route 2: Fetch top headlines from BBC
+// Fetch top headlines
 router.get('/fetch-top-headlines', async (req, res) => {
   try {
     const date = new Date();
@@ -70,7 +72,7 @@ router.get('/fetch-top-headlines', async (req, res) => {
   }
 });
 
-// 🔹 Route 3: Get all news from MongoDB with filters
+// Route 3: Get all news from MongoDB with filters
 router.get('/', async (req, res) => {
   try {
     const { title, description, from, to } = req.query;
@@ -99,5 +101,41 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+router.get('/:id', async (req, res) => {
+    try {
+      const article = await News.findById(req.params.id);
+      if (!article) {
+        return res.status(404).json({ message: 'Article not found' });
+      }
+      res.json(article);
+    } catch (err) {
+      console.error('Error fetching article by ID:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  router.delete("/del/:id", async(req,res)=>{
+    try {
+        const del = await News.findByIdAndDelete(req.params.id);
+        if(!del){
+            return res.status(404).json({message:"Cannot delete"});
+        }
+        return res.status(200).json({message:"Successfully Deleted"})
+    }catch(err){
+        res.status(500).json({message:"Internal Error"})
+    }
+  });
+
+// router.get('/top-headlines', async (req, res) => {
+//     try {
+//       const headlines = await Headline.find().sort({ publishedAt: -1 }).limit(8); // only top 8
+//       res.json(headlines);
+//     } catch (err) {
+//       console.error("Error loading top headlines:", err.message);
+//       res.status(500).json({ error: err.message });
+//     }
+//   });
 
 module.exports = router;

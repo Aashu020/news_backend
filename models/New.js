@@ -10,7 +10,7 @@ const newsSchema = new mongoose.Schema({
   description: String,
   url: {
     type: String,
-    unique: true // ✅ prevent duplicate URLs
+    unique: true // prevent duplicate URLs
   },
   urlToImage: String,
   publishedAt: Date,
